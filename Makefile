@@ -1,5 +1,9 @@
 TARGET_NAME := handy
 
+ifneq ($(EMSCRIPTEN),)
+	platform = emscripten
+endif
+
 ifeq ($(platform),)
 	platform = unix
 	ifeq ($(shell uname -a),)
@@ -144,6 +148,11 @@ else ifneq (,$(findstring armv,$(platform)))
 		FLAGS += -mfloat-abi=hard
 	endif
 
+# emscripten
+else ifeq ($(platform), emscripten)
+	TARGET := $(TARGET_NAME)_libretro_emscripten.bc
+	FLAGS += -DWANT_CRC32
+
 # Windows
 else
 	fpic :=
@@ -166,7 +175,7 @@ FLAGS += -O0
 else ifeq ($(platform),psp1)
 FLAGS += -O2
 else
-FLAGS += -O3 
+FLAGS += -O3
 endif
 
 FLAGS += -fomit-frame-pointer -fno-tree-vectorize -I. $(fpic) $(libs) $(includes)
